@@ -1,0 +1,28 @@
+#!/bin/bash
+# usage: ./Projectfile [command]
+
+#
+# helpers
+#
+
+docs () {
+  (sleep 3; open http://localhost:8000) &
+  docker compose run --service-ports docs
+}
+
+#
+# boilerplate
+#
+
+set -e
+
+list () {
+  compgen -A function
+}
+
+if list | grep -qFx -- "${1:-}"
+then "$@"; exit $?
+else
+  printf "unknown command: %s\n" "${1:-}" >&2
+  exit 1
+fi
