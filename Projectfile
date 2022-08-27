@@ -33,6 +33,10 @@ clean () {
 # helpers
 #
 
+test () {
+  print "no tests yet...\n" >&2
+}
+
 docs () {
   (sleep 3; open http://localhost:8000) &
   docker compose run --service-ports mkdocs
