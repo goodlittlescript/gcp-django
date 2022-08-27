@@ -34,7 +34,7 @@ clean () {
 #
 
 test () {
-  print "no tests yet...\n" >&2
+  up && docker compose exec shell /app/bin/test
 }
 
 docs () {
