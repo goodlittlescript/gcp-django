@@ -5,6 +5,7 @@ services:
     build:
       dockerfile: Dockerfile
     command: [/bin/sleep, "86400"]
+    env_file: docker-compose.env
     ports:
       - "8080:8080"
     volumes:
