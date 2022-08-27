@@ -1,0 +1,3 @@
+#!/bin/bash
+cd /app/src
+gunicorn gcp_django.wsgi

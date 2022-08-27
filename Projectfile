@@ -2,12 +2,40 @@
 # usage: ./Projectfile [command]
 
 #
+# develop
+#
+
+images () {
+  docker compose build --parallel
+}
+
+up () {
+  docker compose up --detach shell
+}
+
+shell () {
+  up && docker compose exec shell /bin/bash -l
+}
+
+rootshell () {
+  up && docker compose exec -u root shell /bin/bash -l
+}
+
+down () {
+  docker compose stop
+}
+
+clean () {
+  docker compose rm -s -f -v
+}
+
+#
 # helpers
 #
 
 docs () {
   (sleep 3; open http://localhost:8000) &
-  docker compose run --service-ports docs
+  docker compose run --service-ports mkdocs
 }
 
 #
