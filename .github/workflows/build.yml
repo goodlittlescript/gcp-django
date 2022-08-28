@@ -22,7 +22,7 @@ jobs:
       run: |-
         echo "RUNTIME_IMAGE=${DOCKER_REPO}/runtime:${GITHUB_SHA}" >> "$GITHUB_ENV"
     - name: 'Authenticate to Google Cloud'
-      uses: 'google-github-actions/auth@v0.4.0'
+      uses: 'google-github-actions/auth@v0'
       with:
         workload_identity_provider: 'projects/166389283410/locations/global/workloadIdentityPools/github-actions-pool'
         service_account: 'dt-gcp-django@goodlittlescript-io-dev.iam.gserviceaccount.com'
