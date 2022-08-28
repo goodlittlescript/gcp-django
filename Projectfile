@@ -37,7 +37,7 @@ test () {
 }
 
 push () {
-  d
+  docker compose push
 }
 
 docs () {
