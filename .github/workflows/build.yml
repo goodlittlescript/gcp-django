@@ -15,11 +15,12 @@ jobs:
       contents: 'read'
       id-token: 'write'
     env:
-      DOCKER_REPO: us-central1-docker.pkg.dev/goodlittlescript-io-dev
+      DOCKER_REPO: us-central1-docker.pkg.dev/goodlittlescript-io-dev/gcp-django
     steps:
+    - uses: actions/checkout@v3
     - name: Set Env
       run: |-
-        echo "RUNTIME_IMAGE=${DOCKER_REPO}/gcp-django/runtime:${GITHUB_SHA}" >> "$GITHUB_ENV"
+        echo "RUNTIME_IMAGE=${DOCKER_REPO}/runtime:${GITHUB_SHA}" >> "$GITHUB_ENV"
     - name: 'Authenticate to Google Cloud'
       uses: 'google-github-actions/auth@v0.4.0'
       with:
@@ -27,7 +28,6 @@ jobs:
         service_account: 'dt-gcp-django@goodlittlescript-io-dev.iam.gserviceaccount.com'
     - name: 'Authenticate to Docker Repo'
       run: gcloud auth configure-docker "$(sed -e 's|/.*||' <<<"$DOCKER_REPO")"
-    - uses: actions/checkout@v3
     - name: Build images
       run: ./Projectfile images
     - name: Test images
