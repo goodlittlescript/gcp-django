@@ -11,10 +11,14 @@ jobs:
   build:
 
     runs-on: ubuntu-latest
-
+    env:
+      DOCKER_REPO: us-central1-docker.pkg.dev/goodlittlescript-io-dev
+      RUNTIME_IMAGE: $DOCKER_REPO/gcp-django/runtime:$GITHUB_SHA
     steps:
     - uses: actions/checkout@v3
     - name: Build images
       run: ./Projectfile images
     - name: Test images
       run: ./Projectfile test
+    - name: Push images
+      run: ./Projectfile push

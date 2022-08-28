@@ -4,7 +4,7 @@ Setup auth:
 
 ```shell
 gcloud auth login
-gcloud auth configure-docker
+gcloud auth configure-docker us-central1-docker.pkg.dev
 gcloud auth application-default login
 ```
 

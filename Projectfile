@@ -1,5 +1,4 @@
 #!/bin/bash
-# usage: ./Projectfile [command]
 
 #
 # develop
@@ -30,11 +29,15 @@ clean () {
 }
 
 #
-# helpers
+# workflow
 #
 
 test () {
   up && docker compose exec shell /app/bin/test
+}
+
+push () {
+  d
 }
 
 docs () {
