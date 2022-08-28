@@ -11,6 +11,8 @@ jobs:
   build:
 
     runs-on: ubuntu-latest
+    permissions:
+      id-token: 'write'
     env:
       DOCKER_REPO: us-central1-docker.pkg.dev/goodlittlescript-io-dev
     steps:
