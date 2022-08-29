@@ -43,6 +43,9 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     needs: build
+    permissions:
+      contents: 'read'
+      id-token: 'write'
     env:
       SERVICE_NAME: gcp-django
       IMAGE_NAME: shell
