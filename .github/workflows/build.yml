@@ -6,6 +6,10 @@ on:
   pull_request:
     branches: [ "main" ]
 
+env:
+  DOCKER_REPO: us-central1-docker.pkg.dev/goodlittlescript-io-dev/gcp-django
+  IMAGES_FILE: images.json
+
 jobs:
 
   build:
@@ -14,8 +18,6 @@ jobs:
     permissions:
       contents: 'read'
       id-token: 'write'
-    env:
-      DOCKER_REPO: us-central1-docker.pkg.dev/goodlittlescript-io-dev/gcp-django
     steps:
     - uses: actions/checkout@v3
     - name: Set Env
@@ -33,4 +35,8 @@ jobs:
     - name: Test images
       run: ./Projectfile test
     - name: Push images
-      run: ./Projectfile push
+      run: ./Projectfile push > "$IMAGES_FILE"
+    - uses: actions/upload-artifact@master
+      with:
+        name: images
+        path: ${{env.IMAGES_FILE}}

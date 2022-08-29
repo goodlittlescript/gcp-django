@@ -38,6 +38,8 @@ test () {
 
 push () {
   docker compose push
+  docker compose convert --resolve-image-digests --format json |
+  jq '.services | map_values(.image)'
 }
 
 docs () {
