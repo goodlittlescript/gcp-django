@@ -47,6 +47,7 @@ jobs:
       SERVICE_NAME: gcp-django
       IMAGE_NAME: shell
     steps:
+    - uses: actions/checkout@v3
     - uses: actions/download-artifact@master
       with:
         name: Image Digests
