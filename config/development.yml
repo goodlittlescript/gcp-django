@@ -1,0 +1,4 @@
+# Development flags file
+- --service-account: rt-gcp-django@goodlittlescript-io-dev.iam.gserviceaccount.com
+- --project: goodlittlescript-io-dev
+- --region: us-central1
