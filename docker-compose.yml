@@ -12,8 +12,7 @@ services:
     volumes:
     - $PWD:/app
     - $PWD/tmp/home/.bash_history:/home/appuser/.bash_history
-    - $HOME/.gitconfig:/home/appuser/.gitconfig
-    - $HOME/.ssh:/home/appuser/.ssh
+    - $HOME/.config:/home/appuser/.config
 
   docs:
     image: squidfunk/mkdocs-material

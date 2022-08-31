@@ -13,7 +13,7 @@ up () {
 }
 
 shell () {
-  up && docker compose exec shell /bin/bash -l
+  up && docker compose exec shell /bin/berglas exec -- /bin/bash -l
 }
 
 rootshell () {
