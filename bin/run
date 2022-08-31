@@ -1,3 +1,3 @@
 #!/bin/bash
 cd /app/src
-gunicorn gcp_django.wsgi
+gunicorn gcp_django.wsgi $GUNICORN_OPTS
