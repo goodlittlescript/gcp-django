@@ -18,5 +18,5 @@ RUN pip install -r requirements.txt
 
 USER appuser
 
-COPY --chown appuser:appuser . /app
+COPY --chown=appuser:appuser . /app
 CMD ["/app/bin/run"]
