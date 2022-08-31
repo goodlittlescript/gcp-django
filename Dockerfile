@@ -16,3 +16,5 @@ COPY ./requirements.txt /app
 RUN pip install -r requirements.txt
 
 USER appuser
+
+CMD ["/app/bin/run"]
