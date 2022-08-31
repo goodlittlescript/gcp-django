@@ -9,7 +9,8 @@ WORKDIR /app
 
 # Install development dependencies
 RUN apt-get update && \
-    apt-get install -y curl jq
+    apt-get install -y curl jq && \
+    rm -rf /var/lib/apt/lists/*
 
 # Install project dependencies
 COPY ./requirements.txt /app
@@ -17,4 +18,5 @@ RUN pip install -r requirements.txt
 
 USER appuser
 
+COPY --chown appuser:appuser . /app
 CMD ["/app/bin/run"]
