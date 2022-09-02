@@ -1,5 +1,6 @@
 # Development flags file
 - --service-account: rt-gcp-django@goodlittlescript-io-dev.iam.gserviceaccount.com
 - --set-env-vars: DJANGO_SECRET_KEY=sm://goodlittlescript-io-dev/gcp-django--secret-key
+- --set-env-vars: DJANGO_ALLOWED_HOSTS=gcp-django.dev.goodlittlescript.io
 - --project: goodlittlescript-io-dev
 - --region: us-central1
