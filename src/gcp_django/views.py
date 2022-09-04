@@ -8,7 +8,7 @@ def hello_world(request):
     return HttpResponse("GCP Django")
 
 def healthcheck(request):
-    logger.info("performing healthcheck")
+    logger.info("Performing healthcheck")
     response = {'status': 'ok'}
     return HttpResponse(json.dumps(response))
 
