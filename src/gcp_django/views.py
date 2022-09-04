@@ -13,4 +13,4 @@ def healthcheck(request):
     return HttpResponse(json.dumps(response))
 
 def boom(request):
-    raise Exception('boom')
+    raise Exception('Boom!')
