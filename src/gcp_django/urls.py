@@ -16,9 +16,10 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 from .views import basic
+from .views import storage
 
 urlpatterns = [
-    path('', basic.hello_world),
+    path('', basic.index),
     path('admin/', admin.site.urls),
     path('healthcheck', basic.healthcheck),
     path('boom', basic.boom),

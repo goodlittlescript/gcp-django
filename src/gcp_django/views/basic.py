@@ -4,7 +4,7 @@ import json
 import logging
 logger = logging.getLogger(__name__)
 
-def hello_world(request):
+def index(request):
     return HttpResponse("GCP Django")
 
 def healthcheck(request):
