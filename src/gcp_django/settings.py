@@ -45,6 +45,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'google.cloud.logging_v2.handlers.middleware.request.RequestMiddleware',
 ]
 
 ROOT_URLCONF = 'gcp_django.urls'
