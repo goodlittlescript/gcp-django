@@ -1,0 +1,67 @@
+name: Build
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+env:
+  DOCKER_REPO: us-central1-docker.pkg.dev/goodlittlescript-io-dev/gcp-django
+  IMAGES_FILE: images.json
+
+jobs:
+
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: 'read'
+      id-token: 'write'
+    steps:
+    - uses: actions/checkout@v3
+    - name: Set Env
+      run: |-
+        echo "RUNTIME_IMAGE=${DOCKER_REPO}/runtime:${GITHUB_SHA}" >> "$GITHUB_ENV"
+    - name: 'Authenticate to Google Cloud'
+      uses: 'google-github-actions/auth@v0'
+      with:
+        workload_identity_provider: 'projects/166389283410/locations/global/workloadIdentityPools/github-actions-pool/providers/github-actions-prvdr'
+        service_account: 'dt-gcp-django@goodlittlescript-io-dev.iam.gserviceaccount.com'
+    - name: 'Authenticate to Docker Repo'
+      run: gcloud auth configure-docker "$(sed -e 's|/.*||' <<<"$DOCKER_REPO")"
+    - name: Build images
+      run: ./Projectfile images
+    - name: Test images
+      run: ./Projectfile test
+    - name: Push images
+      run: ./Projectfile push > "$IMAGES_FILE"
+    - uses: actions/upload-artifact@master
+      with:
+        name: Image Digests
+        path: ${{env.IMAGES_FILE}}
+
+  deploy:
+    runs-on: ubuntu-latest
+    needs: build
+    permissions:
+      contents: 'read'
+      id-token: 'write'
+    env:
+      SERVICE_NAME: gcp-django
+      IMAGE_NAME: shell
+    steps:
+    - uses: actions/checkout@v3
+    - uses: actions/download-artifact@master
+      with:
+        name: Image Digests
+    - name: 'Authenticate to Google Cloud'
+      uses: 'google-github-actions/auth@v0'
+      with:
+        workload_identity_provider: 'projects/166389283410/locations/global/workloadIdentityPools/github-actions-pool/providers/github-actions-prvdr'
+        service_account: 'dt-gcp-django@goodlittlescript-io-dev.iam.gserviceaccount.com'
+    - name: Deploy CloudRun
+      run: |-
+        IMAGE256="$(jq -r '.[env.IMAGE_NAME]' "$IMAGES_FILE")"
+        REVISION_TAG="sha-$(head -c 7 <<<"$GITHUB_SHA")"
+        REVISION_SUFFIX="$GITHUB_RUN_ID"
+        gcloud beta run deploy "$SERVICE_NAME" --image="$IMAGE256" --revision-suffix "$REVISION_SUFFIX" --tag "$REVISION_TAG" --flags-file=config/development.yml

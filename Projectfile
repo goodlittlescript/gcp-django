@@ -1,5 +1,4 @@
 #!/bin/bash
-# usage: ./Projectfile [command]
 
 #
 # develop
@@ -14,7 +13,7 @@ up () {
 }
 
 shell () {
-  up && docker compose exec shell /bin/bash -l
+  up && docker compose exec shell /bin/berglas exec -- /bin/bash -l
 }
 
 rootshell () {
@@ -30,8 +29,18 @@ clean () {
 }
 
 #
-# helpers
+# workflow
 #
+
+test () {
+  up && docker compose exec shell /app/bin/test
+}
+
+push () {
+  docker compose push
+  docker compose convert --resolve-image-digests --format json |
+  jq '.services | map_values(.image)'
+}
 
 docs () {
   (sleep 3; open http://localhost:8000) &

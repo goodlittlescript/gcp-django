@@ -2,6 +2,7 @@
 version: '3.6'
 services:
   shell:
+    image: ${RUNTIME_IMAGE}
     build:
       dockerfile: Dockerfile
     command: [/bin/sleep, "86400"]
@@ -11,8 +12,7 @@ services:
     volumes:
     - $PWD:/app
     - $PWD/tmp/home/.bash_history:/home/appuser/.bash_history
-    - $HOME/.gitconfig:/home/appuser/.gitconfig
-    - $HOME/.ssh:/home/appuser/.ssh
+    - $HOME/.config:/home/appuser/.config
 
   docs:
     image: squidfunk/mkdocs-material
