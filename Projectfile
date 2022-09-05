@@ -33,6 +33,11 @@ clean () {
 #
 
 test () {
+  echo "GITHUB_ENV"
+  cat "$GITHUB_ENV"
+  echo "Local ENV"
+  ls -la .
+  env | sort
   up && docker compose exec shell /app/bin/test
 }
 

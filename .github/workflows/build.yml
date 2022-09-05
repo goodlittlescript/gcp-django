@@ -33,13 +33,7 @@ jobs:
     - name: Build images
       run: ./Projectfile images
     - name: Test images
-      run:
-        - echo "GITHUB_ENV"
-        - cat "$GITHUB_ENV"
-        - echo "Local ENV"
-        - ls -la .
-        - env | sort
-        - ./Projectfile test
+      run: ./Projectfile test
     - name: Push images
       run: ./Projectfile push > "$IMAGES_FILE"
     - uses: actions/upload-artifact@master
