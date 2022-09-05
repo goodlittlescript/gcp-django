@@ -29,7 +29,7 @@ jobs:
         workload_identity_provider: 'projects/166389283410/locations/global/workloadIdentityPools/github-actions-pool/providers/github-actions-prvdr'
         service_account: 'dt-gcp-django@goodlittlescript-io-dev.iam.gserviceaccount.com'
     - name: 'Set auth for later'
-      run: cp "$GOOGLE_GHA_CREDS_PATH" "$HOME/.config/gcloud/application_default_credentials.json"
+      run: mkdir -p "$HOME/.config/gcloud" && cp "$GOOGLE_GHA_CREDS_PATH" "$HOME/.config/gcloud/application_default_credentials.json"
     - name: 'Debug'
       run: cat "$GOOGLE_GHA_CREDS_PATH"
     - name: 'Authenticate to Docker Repo'
