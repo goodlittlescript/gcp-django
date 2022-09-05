@@ -6,17 +6,18 @@ services:
     build:
       dockerfile: Dockerfile
     command: [/bin/sleep, "86400"]
-    env_file: ${GITHUB_ENV:-docker-compose.env}
+    env_file:
+      - docker-compose.env
     ports:
       - "8080:8080"
     volumes:
-    - $PWD:/app
-    - $PWD/tmp/home/.bash_history:/home/appuser/.bash_history
-    - $HOME/.config:/home/appuser/.config
+      - $PWD:/app
+      - $PWD/tmp/home/.bash_history:/home/appuser/.bash_history
+      - $HOME/.config:/home/appuser/.config
 
   docs:
     image: squidfunk/mkdocs-material
     ports:
       - "8000:8000"
     volumes:
-    - $PWD:/docs
+      - $PWD:/docs
