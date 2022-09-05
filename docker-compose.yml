@@ -8,8 +8,6 @@ services:
     command: [/bin/sleep, "86400"]
     env_file:
       - docker-compose.env
-    environment:
-      - GOOGLE_APPLICATION_CREDENTIALS
     ports:
       - "8080:8080"
     volumes:
