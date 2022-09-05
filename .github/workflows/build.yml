@@ -20,16 +20,15 @@ jobs:
     steps:
     - uses: actions/checkout@v3
     - name: 'Authenticate to Google Cloud'
-      uses: 'google-github-actions/auth@v0'
+      uses: 'thegoodlittlescript/auth@f150ffa575185de66850c857951028cdc360a439'
       with:
         workload_identity_provider: 'projects/166389283410/locations/global/workloadIdentityPools/github-actions-pool/providers/github-actions-prvdr'
         service_account: 'dt-gcp-django@goodlittlescript-io-dev.iam.gserviceaccount.com'
+        create_as_application_default_credentials: true
     - name: 'Authenticate to Docker Repo'
       run: gcloud auth configure-docker "$(sed -e 's|/.*||' <<<"$DOCKER_REPO")"
     - name: Set Env
       run: |-
-        mkdir -p "$HOME/.config/gcloud"
-        cp "$GOOGLE_GHA_CREDS_PATH" "$HOME/.config/gcloud/application_default_credentials.json"
         echo "RUNTIME_IMAGE=${DOCKER_REPO}/runtime:${GITHUB_SHA}" >> "$GITHUB_ENV"
     - name: Build images
       run: ./Projectfile images
