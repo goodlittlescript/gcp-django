@@ -20,7 +20,7 @@ jobs:
     steps:
     - uses: actions/checkout@v3
     - name: 'Authenticate to Google Cloud'
-      uses: 'thegoodlittlescript/auth@0f9353dee328276e09c1173437fce090661229b2'
+      uses: 'thegoodlittlescript/auth@ec3873230ebf10beb24f3d65a4ee53ef7f0913bf'
       with:
         workload_identity_provider: 'projects/166389283410/locations/global/workloadIdentityPools/github-actions-pool/providers/github-actions-prvdr'
         service_account: 'dt-gcp-django@goodlittlescript-io-dev.iam.gserviceaccount.com'

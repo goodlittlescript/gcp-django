@@ -2,22 +2,6 @@
 version: '3.6'
 services:
   shell:
-    image: ${RUNTIME_IMAGE}
-    build:
-      dockerfile: Dockerfile
-    command: [/bin/sleep, "86400"]
-    env_file:
-      - docker-compose.env
-    ports:
-      - "8080:8080"
+    image: google/cloud-sdk
     volumes:
-      - $PWD:/app
-      - $PWD/tmp/home/.bash_history:/home/appuser/.bash_history
-      - $HOME/.config:/home/appuser/.config
-
-  docs:
-    image: squidfunk/mkdocs-material
-    ports:
-      - "8000:8000"
-    volumes:
-      - $PWD:/docs
+      - $HOME/.config:/root/.config
