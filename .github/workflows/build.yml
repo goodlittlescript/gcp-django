@@ -28,7 +28,7 @@ jobs:
       run: gcloud auth configure-docker "$(sed -e 's|/.*||' <<<"$DOCKER_REPO")"
     - name: Set Env
       run: |-
-        echo "GOOGLE_APPLICATION_CREDENTIALS" >> docker-compose.env
+        echo "GOOGLE_APPLICATION_CREDENTIALS=/app/$(basename "$GOOGLE_APPLICATION_CREDENTIALS")" >> docker-compose.env
         echo "RUNTIME_IMAGE=${DOCKER_REPO}/runtime:${GITHUB_SHA}" >> "$GITHUB_ENV"
     - name: Build images
       run: ./Projectfile images
