@@ -66,4 +66,5 @@ jobs:
         IMAGE256="$(jq -r '.[env.IMAGE_NAME]' "$IMAGES_FILE")"
         REVISION_TAG="sha-$(head -c 7 <<<"$GITHUB_SHA")"
         REVISION_SUFFIX="$GITHUB_RUN_ID"
+        printf "Deploy: %s-%s:%s (%s)\n" "$SERVICE_NAME" "$REVISION_SUFFIX" "$REVISION_TAG" "$IMAGE256"
         gcloud beta run deploy "$SERVICE_NAME" --image="$IMAGE256" --revision-suffix "$REVISION_SUFFIX" --tag "$REVISION_TAG" --flags-file=config/development.yml
