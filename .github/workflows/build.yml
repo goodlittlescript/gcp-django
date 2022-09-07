@@ -31,8 +31,6 @@ jobs:
     - name: 'Set Env'
       run: |-
         echo "RUNTIME_IMAGE=${DOCKER_REPO}/runtime:${GITHUB_SHA}" >> "$GITHUB_ENV"
-    - name: 'Warm Docker Cache'
-      run: docker pull "${RUNTIME_IMAGE%:*}"
     - name: Build images
       run: ./Projectfile images
     - name: Test images
