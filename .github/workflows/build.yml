@@ -26,9 +26,10 @@ jobs:
         service_account: 'dt-gcp-django@goodlittlescript-io-dev.iam.gserviceaccount.com'
     - name: 'Authenticate to Docker Repo'
       run: gcloud auth configure-docker "$(sed -e 's|/.*||' <<<"$DOCKER_REPO")"
+    - name: 'Authenticate in Docker Compose'
+      run: echo "GOOGLE_APPLICATION_CREDENTIALS=/app/$(basename "$GOOGLE_APPLICATION_CREDENTIALS")" >> docker-compose.env
     - name: Set Env
       run: |-
-        echo "GOOGLE_APPLICATION_CREDENTIALS=/app/$(basename "$GOOGLE_APPLICATION_CREDENTIALS")" >> docker-compose.env
         echo "RUNTIME_IMAGE=${DOCKER_REPO}/runtime:${GITHUB_SHA}" >> "$GITHUB_ENV"
     - name: Build images
       run: ./Projectfile images
@@ -38,7 +39,7 @@ jobs:
       run: ./Projectfile push > "$IMAGES_FILE"
     - uses: actions/upload-artifact@master
       with:
-        name: Image Digests
+        name: image_digests
         path: ${{env.IMAGES_FILE}}
 
   deploy:
@@ -52,15 +53,15 @@ jobs:
       IMAGE_NAME: shell
     steps:
     - uses: actions/checkout@v3
-    - uses: actions/download-artifact@master
-      with:
-        name: Image Digests
     - name: 'Authenticate to Google Cloud'
       uses: 'google-github-actions/auth@v0'
       with:
         workload_identity_provider: 'projects/166389283410/locations/global/workloadIdentityPools/github-actions-pool/providers/github-actions-prvdr'
         service_account: 'dt-gcp-django@goodlittlescript-io-dev.iam.gserviceaccount.com'
-    - name: Deploy CloudRun
+    - uses: actions/download-artifact@master
+      with:
+        name: image_digests
+    - name: 'Deploy CloudRun'
       run: |-
         IMAGE256="$(jq -r '.[env.IMAGE_NAME]' "$IMAGES_FILE")"
         REVISION_TAG="sha-$(head -c 7 <<<"$GITHUB_SHA")"

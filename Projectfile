@@ -33,8 +33,6 @@ clean () {
 #
 
 test () {
-  echo $HOME
-  whoami
   up && docker compose exec shell /app/bin/test
 }
 
