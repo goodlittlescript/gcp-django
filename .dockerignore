@@ -1,2 +1,4 @@
-.git
-/tmp
+*
+!bin/
+!src/
+!requirements.txt

@@ -24,5 +24,5 @@ RUN pip install -r requirements.txt
 
 USER appuser
 
-COPY --chown=appuser:appuser ./bin/ ./src/ /app/
+COPY --chown=appuser:appuser . /app
 CMD ["/bin/berglas", "exec", "/app/bin/run"]
