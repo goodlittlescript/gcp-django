@@ -61,10 +61,13 @@ jobs:
     - uses: actions/download-artifact@master
       with:
         name: image_digests
+    - name: 'Set Env'
+      run: |-
+        echo "IMAGE256=$(jq -r '.[env.IMAGE_NAME]' "$IMAGES_FILE")" >> "$GITHUB_ENV"
+        echo "REVISION_TAG=sha-$(head -c 7 <<<"$GITHUB_SHA")" >> "$GITHUB_ENV"
+        echo "REVISION_SUFFIX=$GITHUB_RUN_ID" >> "$GITHUB_ENV"
     - name: 'Deploy CloudRun'
       run: |-
-        IMAGE256="$(jq -r '.[env.IMAGE_NAME]' "$IMAGES_FILE")"
-        REVISION_TAG="sha-$(head -c 7 <<<"$GITHUB_SHA")"
-        REVISION_SUFFIX="$GITHUB_RUN_ID"
-        printf "Deploy: %s-%s:%s (%s)\n" "$SERVICE_NAME" "$REVISION_SUFFIX" "$REVISION_TAG" "$IMAGE256"
+        printf "Service: %s-%s:%s\n" "$SERVICE_NAME" "$REVISION_SUFFIX" "$REVISION_TAG"
+        printf "Image: %s\n" "$IMAGE256"
         gcloud beta run deploy "$SERVICE_NAME" --image="$IMAGE256" --revision-suffix "$REVISION_SUFFIX" --tag "$REVISION_TAG" --flags-file=config/development.yml
