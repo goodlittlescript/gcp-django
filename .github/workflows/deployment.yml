@@ -7,12 +7,13 @@ on:
     branches: [ "main" ]
 
 env:
-  DOCKER_REPO: us-central1-docker.pkg.dev/goodlittlescript-io-dev/gcp-django
+  SOURCE_REPO: us-central1-docker.pkg.dev/goodlittlescript-io-dev/gcp-django
   IMAGES_FILE: images.json
 
 jobs:
 
   build:
+    name: Build
     runs-on: ubuntu-latest
     permissions:
       contents: 'read'
@@ -25,12 +26,12 @@ jobs:
         workload_identity_provider: 'projects/166389283410/locations/global/workloadIdentityPools/github-actions-pool/providers/github-actions-prvdr'
         service_account: 'dt-gcp-django@goodlittlescript-io-dev.iam.gserviceaccount.com'
     - name: 'Authenticate to Docker Repo'
-      run: gcloud auth configure-docker "$(sed -e 's|/.*||' <<<"$DOCKER_REPO")"
+      run: gcloud auth configure-docker "$(sed -e 's|/.*||' <<<"$SOURCE_REPO")"
     - name: 'Authenticate in Docker Compose'
       run: echo "GOOGLE_APPLICATION_CREDENTIALS=/app/$(basename "$GOOGLE_APPLICATION_CREDENTIALS")" >> docker-compose.env
     - name: 'Set Env'
       run: |-
-        echo "RUNTIME_IMAGE=${DOCKER_REPO}/runtime:${GITHUB_SHA}" >> "$GITHUB_ENV"
+        echo "RUNTIME_IMAGE=${SOURCE_REPO}/runtime:${GITHUB_SHA}" >> "$GITHUB_ENV"
     - name: Build images
       run: ./Projectfile images
     - name: Test images
@@ -43,6 +44,7 @@ jobs:
         path: ${{env.IMAGES_FILE}}
 
   deploy-dev:
+    name: Deploy Dev
     runs-on: ubuntu-latest
     needs: build
     environment:
@@ -53,6 +55,7 @@ jobs:
     env:
       SERVICE_NAME: gcp-django
       IMAGE_NAME: shell
+      TARGET_REPO: us-central1-docker.pkg.dev/goodlittlescript-io-dev/gcp-django
     steps:
     - uses: actions/checkout@v3
     - name: 'Authenticate to Google Cloud'
@@ -60,21 +63,29 @@ jobs:
       with:
         workload_identity_provider: 'projects/166389283410/locations/global/workloadIdentityPools/github-actions-pool/providers/github-actions-prvdr'
         service_account: 'dt-gcp-django@goodlittlescript-io-dev.iam.gserviceaccount.com'
+    - name: 'Authenticate to Docker Repo'
+      run: gcloud auth configure-docker "$(sed -e 's|/.*||' <<<"$SOURCE_REPO")"
     - uses: actions/download-artifact@master
       with:
         name: image_digests
     - name: 'Set Env'
       run: |-
-        echo "IMAGE256=$(jq -r '.[env.IMAGE_NAME]' "$IMAGES_FILE")" >> "$GITHUB_ENV"
+        SOURCE_IMAGE256="$(jq -r '.[env.IMAGE_NAME]' "$IMAGES_FILE")"
+        echo "SOURCE_IMAGE256=${SOURCE_IMAGE256}" >> "$GITHUB_ENV"
+        echo "TARGET_IMAGE256=${TARGET_REPO}${SOURCE_IMAGE256#$SOURCE_REPO}" >> "$GITHUB_ENV"
         echo "REVISION_TAG=sha-$(head -c 7 <<<"$GITHUB_SHA")" >> "$GITHUB_ENV"
         echo "REVISION_SUFFIX=$GITHUB_RUN_ID" >> "$GITHUB_ENV"
+    - name: 'Copy Image'
+      run: |-
+        skopeo copy docker://"${SOURCE_IMAGE256/:*@sha256/@sha256}" docker://"${TARGET_IMAGE256%@sha256*}"
     - name: 'Deploy CloudRun'
       run: |-
         printf "Service: %s-%s:%s\n" "$SERVICE_NAME" "$REVISION_SUFFIX" "$REVISION_TAG"
-        printf "Image: %s\n" "$IMAGE256"
-        gcloud beta run deploy "$SERVICE_NAME" --image="$IMAGE256" --revision-suffix "$REVISION_SUFFIX" --tag "$REVISION_TAG" --flags-file=config/dev.yml
+        printf "Image: %s\n" "$TARGET_IMAGE256"
+        gcloud beta run deploy "$SERVICE_NAME" --image="$TARGET_IMAGE256" --revision-suffix "$REVISION_SUFFIX" --tag "$REVISION_TAG" --flags-file=config/dev.yml
 
   deploy-prd:
+    name: Deploy Prd
     runs-on: ubuntu-latest
     needs: build
     environment:
@@ -85,6 +96,7 @@ jobs:
     env:
       SERVICE_NAME: gcp-django
       IMAGE_NAME: shell
+      TARGET_REPO: us-central1-docker.pkg.dev/goodlittlescript-io-prd/gcp-django
     steps:
     - uses: actions/checkout@v3
     - name: 'Authenticate to Google Cloud'
@@ -92,16 +104,23 @@ jobs:
       with:
         workload_identity_provider: 'projects/166389283410/locations/global/workloadIdentityPools/github-actions-pool/providers/github-actions-prvdr'
         service_account: 'dt-gcp-django@goodlittlescript-io-prd.iam.gserviceaccount.com'
+    - name: 'Authenticate to Docker Repo'
+      run: gcloud auth configure-docker "$(sed -e 's|/.*||' <<<"$SOURCE_REPO")"
     - uses: actions/download-artifact@master
       with:
         name: image_digests
     - name: 'Set Env'
       run: |-
-        echo "IMAGE256=$(jq -r '.[env.IMAGE_NAME]' "$IMAGES_FILE")" >> "$GITHUB_ENV"
+        SOURCE_IMAGE256="$(jq -r '.[env.IMAGE_NAME]' "$IMAGES_FILE")"
+        echo "SOURCE_IMAGE256=${SOURCE_IMAGE256}" >> "$GITHUB_ENV"
+        echo "TARGET_IMAGE256=${TARGET_REPO}${SOURCE_IMAGE256#$SOURCE_REPO}" >> "$GITHUB_ENV"
         echo "REVISION_TAG=sha-$(head -c 7 <<<"$GITHUB_SHA")" >> "$GITHUB_ENV"
         echo "REVISION_SUFFIX=$GITHUB_RUN_ID" >> "$GITHUB_ENV"
+    - name: 'Copy Image'
+      run: |-
+        skopeo copy docker://"${SOURCE_IMAGE256/:*@sha256/@sha256}" docker://"${TARGET_IMAGE256%@sha256*}"
     - name: 'Deploy CloudRun'
       run: |-
         printf "Service: %s-%s:%s\n" "$SERVICE_NAME" "$REVISION_SUFFIX" "$REVISION_TAG"
-        printf "Image: %s\n" "$IMAGE256"
-        gcloud beta run deploy "$SERVICE_NAME" --image="$IMAGE256" --revision-suffix "$REVISION_SUFFIX" --tag "$REVISION_TAG" --flags-file=config/prd.yml
+        printf "Image: %s\n" "$TARGET_IMAGE256"
+        gcloud beta run deploy "$SERVICE_NAME" --image="$TARGET_IMAGE256" --revision-suffix "$REVISION_SUFFIX" --tag "$REVISION_TAG" --flags-file=config/prd.yml
