@@ -9,3 +9,6 @@ local_settings.py
 
 .env
 db.sqlite3
+
+# Ignore generated credentials from google-github-actions/auth
+gha-creds-*.json

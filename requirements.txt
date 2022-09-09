@@ -1,5 +1,6 @@
 Django==4.0.4
 gunicorn==20.1.0
+google-cloud-storage
 google-cloud-logging==3.1.2
 ## The following requirements were added by pip freeze:
 asgiref==3.5.2
@@ -25,3 +26,5 @@ rsa==4.9
 six==1.16.0
 sqlparse==0.4.2
 urllib3==1.26.12
+google-crc32c==1.5.0
+google-resumable-media==2.3.3

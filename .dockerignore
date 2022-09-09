@@ -1,2 +1,7 @@
-.git
-/tmp
+# Ignore everything
+*
+
+# Whitelist application files
+!bin/
+!src/
+!requirements.txt
