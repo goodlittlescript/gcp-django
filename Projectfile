@@ -43,8 +43,7 @@ push () {
 }
 
 docs () {
-  (sleep 3; open http://localhost:8000) &
-  docker compose run --rm --service-ports docs
+  docker compose run --rm --service-ports docs "$@"
 }
 
 #
