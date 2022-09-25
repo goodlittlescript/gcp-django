@@ -1,8 +1,11 @@
-name: Publish Docs
+name: Publish Pages
 on:
   push:
     branches:
       - main
+    paths:
+      - docs/**
+      - mkdocs.yml
 
 jobs:
   build:
