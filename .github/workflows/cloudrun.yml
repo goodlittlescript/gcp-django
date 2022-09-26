@@ -10,7 +10,6 @@ on:
       image_file:
         required: true
         type: string
-        default: images.json
       image_name:
         required: true
         type: string
@@ -24,7 +23,7 @@ on:
         required: true
         type: string
       workload_identity_provider:
-        required: true
+        required: false
         type: string
         default: 'projects/166389283410/locations/global/workloadIdentityPools/github-actions-pool/providers/github-actions-prvdr'
 
