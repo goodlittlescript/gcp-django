@@ -46,11 +46,9 @@ jobs:
   deploy-development:
     name: Deploy Development
     needs: build
-    runs-on: ubuntu-latest
-    environment:
-      name: development
     uses: ./.github/workflows/cloudrun.yml
     with:
+      environment: development
       service_name: gcp-django
       image_name: shell
       source_repo: ${{ env.SOURCE_REPO }}
@@ -59,13 +57,11 @@ jobs:
 
   deploy-production:
     name: Deploy Production
-    if: github.ref == 'refs/heads/main'
     needs: build
-    runs-on: ubuntu-latest
-    environment:
-      name: production
+    if: github.ref == 'refs/heads/main'
     uses: ./.github/workflows/cloudrun.yml
     with:
+      environment: production
       service_name: gcp-django
       image_name: shell
       source_repo: ${{ env.SOURCE_REPO }}
