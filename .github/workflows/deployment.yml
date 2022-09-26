@@ -8,7 +8,6 @@ on:
 
 env:
   SOURCE_REPO: us-central1-docker.pkg.dev/goodlittlescript-io-dev/gcp-django
-  IMAGE_FILE: images.json
 
 jobs:
 
@@ -37,11 +36,15 @@ jobs:
     - name: Test images
       run: ./Projectfile test
     - name: Push images
-      run: ./Projectfile push > "$IMAGE_FILE"
+      run: ./Projectfile push > images.json
     - uses: actions/upload-artifact@master
       with:
         name: image_file
-        path: ${{env.IMAGE_FILE}}
+        path: images.json
+    - name: Set outputs
+      run: |-
+        echo "::set-output image_file=images.json"
+        echo "::set-output source_repo=$SOURCE_REPO"
 
   deploy-development:
     name: Deploy Development
@@ -51,7 +54,8 @@ jobs:
       environment: development
       service_name: gcp-django
       image_name: shell
-      source_repo: ${{ env.SOURCE_REPO }}
+      image_file: ${{ needs.build.outputs.image_file }}
+      source_repo: ${{ needs.build.outputs.source_repo }}
       target_repo: us-central1-docker.pkg.dev/goodlittlescript-io-dev/gcp-django
       workload_identity: dt-gcp-django@goodlittlescript-io-dev.iam.gserviceaccount.com'
 
@@ -64,6 +68,7 @@ jobs:
       environment: production
       service_name: gcp-django
       image_name: shell
-      source_repo: ${{ env.SOURCE_REPO }}
+      image_file: ${{ needs.build.outputs.image_file }}
+      source_repo: ${{ needs.build.outputs.source_repo }}
       target_repo: us-central1-docker.pkg.dev/goodlittlescript-io-prd/gcp-django
       workload_identity: dt-gcp-django@goodlittlescript-io-prd.iam.gserviceaccount.com'
