@@ -50,9 +50,6 @@ jobs:
         terraform init
         terraform plan -out pipeline.tfplan
         gcloud alpha storage cp pipeline.tfplan "$TF_REMOTE_PLAN_FILE"
-    - name: Set outputs
-      run: |-
-        echo "::set-output tf_remote_plan_file=$TF_REMOTE_PLAN_FILE"
 
   apply:
     needs: plan
@@ -64,7 +61,7 @@ jobs:
       id-token: 'write'
     env:
       TERRAFORM_DIR: ${{ inputs.terraform_dir }}
-      TF_REMOTE_PLAN_FILE: ${{ needs.plan.outputs.tf_remote_plan_file }}
+      TERRAFORM_PLAN_BUCKET: ${{ inputs.terraform_plan_bucket }}
     steps:
     - uses: actions/checkout@v3
     - name: 'Authenticate to Google Cloud'
@@ -72,6 +69,9 @@ jobs:
       with:
         workload_identity_provider: ${{ inputs.workload_identity_provider }}
         service_account: ${{ inputs.workload_identity }}
+    - name: 'Set Env'
+      run: |-
+        echo "TF_REMOTE_PLAN_FILE=gs://$TERRAFORM_PLAN_BUCKET/$GITHUB_RUN_ID.tfplan" >> "$GITHUB_ENV"
     - name: 'Plan'
       run: |-
         cd "$TERRAFORM_DIR"
