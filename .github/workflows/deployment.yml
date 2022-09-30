@@ -46,7 +46,7 @@ jobs:
         echo "::set-output image_file=images.json"
         echo "::set-output source_repo=$SOURCE_REPO"
 
-  plan-development:
+  infra-development:
     name: Development
     uses: ./.github/workflows/terraform.yml
     with:
@@ -55,9 +55,19 @@ jobs:
       terraform_plan_bucket: goodlittlescript-io-dev-tfstate/gcp-django
       workload_identity: dt-gcp-django@goodlittlescript-io-dev.iam.gserviceaccount.com
 
+  infra-production:
+    name: Production
+    if: github.ref == 'refs/heads/main'
+    uses: ./.github/workflows/terraform.yml
+    with:
+      environment: production
+      terraform_dir: infra/envs/production
+      terraform_plan_bucket: goodlittlescript-io-prd-tfstate/gcp-django
+      workload_identity: dt-gcp-django@goodlittlescript-io-prd.iam.gserviceaccount.com
+
   deploy-development:
     name: Development
-    needs: build
+    needs: [build, infra-development]
     uses: ./.github/workflows/cloudrun.yml
     with:
       environment: development
@@ -70,7 +80,7 @@ jobs:
 
   deploy-production:
     name: Production
-    needs: build
+    needs: [build, infra-development]
     if: github.ref == 'refs/heads/main'
     uses: ./.github/workflows/cloudrun.yml
     with:

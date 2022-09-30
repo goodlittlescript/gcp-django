@@ -74,7 +74,7 @@ jobs:
     - name: 'Set Env'
       run: |-
         echo "TF_REMOTE_PLAN_FILE=gs://$TERRAFORM_PLAN_BUCKET/$GITHUB_RUN_ID.tfplan" >> "$GITHUB_ENV"
-    - name: 'Plan'
+    - name: 'Apply'
       run: |-
         cd "$TERRAFORM_DIR"
         gcloud alpha storage cp "$TF_REMOTE_PLAN_FILE" pipeline.tfplan
