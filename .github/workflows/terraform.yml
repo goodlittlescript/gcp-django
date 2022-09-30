@@ -7,6 +7,9 @@ on:
       terraform_dir:
         required: true
         type: string
+      terraform_plan_bucket:
+        required: true
+        type: string
       workload_identity:
         required: true
         type: string
@@ -18,13 +21,12 @@ on:
 jobs:
   plan:
     runs-on: ubuntu-latest
-    environment:
-      name: ${{ inputs.environment }}-infra
     permissions:
       contents: 'read'
       id-token: 'write'
     env:
       TERRAFORM_DIR: ${{ inputs.terraform_dir }}
+      TERRAFORM_PLAN_BUCKET: ${{ inputs.terraform_plan_bucket }}
     steps:
     - uses: actions/checkout@v3
     - name: 'Authenticate to Google Cloud'
@@ -32,6 +34,9 @@ jobs:
       with:
         workload_identity_provider: ${{ inputs.workload_identity_provider }}
         service_account: ${{ inputs.workload_identity }}
+    - name: 'Set Env'
+      run: |-
+        TF_REMOTE_PLAN_FILE="gs://$TERRAFORM_PLAN_BUCKET/$GITHUB_RUN_ID.tfplan"
     - name: 'Lint'
       run: |-
         if ! terraform fmt -check "$TERRAFORM_DIR"
@@ -44,3 +49,32 @@ jobs:
         cd "$TERRAFORM_DIR"
         terraform init
         terraform plan -out pipeline.tfplan
+        gcloud alpha storage cp pipeline.tfplan "$TF_REMOTE_PLAN_FILE"
+    - name: Set outputs
+      run: |-
+        echo "::set-output tf_remote_plan_file=$TF_REMOTE_PLAN_FILE"
+
+  apply:
+    needs: plan
+    runs-on: ubuntu-latest
+    environment:
+      name: ${{ inputs.environment }}-infra
+    permissions:
+      contents: 'read'
+      id-token: 'write'
+    env:
+      TERRAFORM_DIR: ${{ inputs.terraform_dir }}
+      TF_REMOTE_PLAN_FILE: ${{ needs.plan.outputs.tf_remote_plan_file }}
+    steps:
+    - uses: actions/checkout@v3
+    - name: 'Authenticate to Google Cloud'
+      uses: 'google-github-actions/auth@v0'
+      with:
+        workload_identity_provider: ${{ inputs.workload_identity_provider }}
+        service_account: ${{ inputs.workload_identity }}
+    - name: 'Plan'
+      run: |-
+        cd "$TERRAFORM_DIR"
+        gcloud alpha storage cp "$TF_REMOTE_PLAN_FILE" pipeline.tfplan
+        terraform init
+        terraform apply pipeline.tfplan

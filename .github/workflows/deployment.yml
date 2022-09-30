@@ -52,6 +52,7 @@ jobs:
     with:
       environment: development
       terraform_dir: infra/envs/development
+      terraform_plan_bucket: goodlittlescript-io-dev-tfstate/gcp-django
       workload_identity: dt-gcp-django@goodlittlescript-io-dev.iam.gserviceaccount.com
 
   deploy-development:
