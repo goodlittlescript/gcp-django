@@ -47,7 +47,7 @@ jobs:
         echo "::set-output source_repo=$SOURCE_REPO"
 
   plan-development:
-    name: Plan Development
+    name: Development
     uses: ./.github/workflows/terraform.yml
     with:
       environment: development
@@ -56,7 +56,7 @@ jobs:
       workload_identity: dt-gcp-django@goodlittlescript-io-dev.iam.gserviceaccount.com
 
   deploy-development:
-    name: Deploy Development
+    name: Development
     needs: build
     uses: ./.github/workflows/cloudrun.yml
     with:
@@ -69,7 +69,7 @@ jobs:
       workload_identity: dt-gcp-django@goodlittlescript-io-dev.iam.gserviceaccount.com
 
   deploy-production:
-    name: Deploy Production
+    name: Production
     needs: build
     if: github.ref == 'refs/heads/main'
     uses: ./.github/workflows/cloudrun.yml

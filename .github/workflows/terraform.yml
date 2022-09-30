@@ -20,6 +20,7 @@ on:
 
 jobs:
   plan:
+    name: "Plan"
     runs-on: ubuntu-latest
     permissions:
       contents: 'read'
@@ -52,6 +53,7 @@ jobs:
         gcloud alpha storage cp pipeline.tfplan "$TF_REMOTE_PLAN_FILE"
 
   apply:
+    name: "Apply"
     needs: plan
     runs-on: ubuntu-latest
     environment:
