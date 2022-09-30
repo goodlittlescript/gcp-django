@@ -80,7 +80,7 @@ jobs:
 
   deploy-production:
     name: Production
-    needs: [build, infra-development]
+    needs: [build, infra-production]
     if: github.ref == 'refs/heads/main'
     uses: ./.github/workflows/cloudrun.yml
     with:
