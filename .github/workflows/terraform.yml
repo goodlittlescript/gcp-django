@@ -36,7 +36,7 @@ jobs:
         service_account: ${{ inputs.workload_identity }}
     - name: 'Set Env'
       run: |-
-        TF_REMOTE_PLAN_FILE="gs://$TERRAFORM_PLAN_BUCKET/$GITHUB_RUN_ID.tfplan"
+        echo "TF_REMOTE_PLAN_FILE=gs://$TERRAFORM_PLAN_BUCKET/$GITHUB_RUN_ID.tfplan" >> "$GITHUB_ENV"
     - name: 'Lint'
       run: |-
         if ! terraform fmt -check "$TERRAFORM_DIR"
