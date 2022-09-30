@@ -1,0 +1,46 @@
+on:
+  workflow_call:
+    inputs:
+      environment:
+        required: true
+        type: string
+      terraform_dir:
+        required: true
+        type: string
+      workload_identity:
+        required: true
+        type: string
+      workload_identity_provider:
+        required: false
+        type: string
+        default: 'projects/166389283410/locations/global/workloadIdentityPools/github-actions-pool/providers/github-actions-prvdr'
+
+jobs:
+  plan:
+    runs-on: ubuntu-latest
+    environment:
+      name: ${{ inputs.environment }}-infra
+    permissions:
+      contents: 'read'
+      id-token: 'write'
+    env:
+      TERRAFORM_DIR: ${{ inputs.terraform_dir }}
+    steps:
+    - uses: actions/checkout@v3
+    - name: 'Authenticate to Google Cloud'
+      uses: 'google-github-actions/auth@v0'
+      with:
+        workload_identity_provider: ${{ inputs.workload_identity_provider }}
+        service_account: ${{ inputs.workload_identity }}
+    - name: 'Lint'
+      run: |-
+        if ! terraform fmt -check "$TERRAFORM_DIR"
+        then
+          printf "Needs terraform fmt\n" >&2
+          exit 1
+        fi
+    - name: 'Plan'
+      run: |-
+        cd "$TERRAFORM_DIR"
+        terraform init
+        terraform plan -out pipeline.tfplan
