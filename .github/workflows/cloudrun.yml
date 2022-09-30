@@ -50,7 +50,7 @@ jobs:
         service_account: ${{ inputs.workload_identity }}
     - uses: actions/download-artifact@master
       with:
-        name: image_digests
+        name: image_file
     - name: 'Set Env'
       run: |-
         echo "SOURCE_IMAGE256=$(jq -r '.[env.IMAGE_NAME]' "$IMAGES_FILE")" >> "$GITHUB_ENV"
