@@ -57,7 +57,7 @@ jobs:
       image_file: ${{ needs.build.outputs.image_file }}
       source_repo: ${{ needs.build.outputs.source_repo }}
       target_repo: us-central1-docker.pkg.dev/goodlittlescript-io-dev/gcp-django
-      workload_identity: dt-gcp-django@goodlittlescript-io-dev.iam.gserviceaccount.com'
+      workload_identity: dt-gcp-django@goodlittlescript-io-dev.iam.gserviceaccount.com
 
   deploy-production:
     name: Deploy Production
@@ -71,4 +71,4 @@ jobs:
       image_file: ${{ needs.build.outputs.image_file }}
       source_repo: ${{ needs.build.outputs.source_repo }}
       target_repo: us-central1-docker.pkg.dev/goodlittlescript-io-prd/gcp-django
-      workload_identity: dt-gcp-django@goodlittlescript-io-prd.iam.gserviceaccount.com'
+      workload_identity: dt-gcp-django@goodlittlescript-io-prd.iam.gserviceaccount.com
