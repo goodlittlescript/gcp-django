@@ -1,0 +1,73 @@
+on:
+  workflow_call:
+    inputs:
+      environment:
+        required: true
+        type: string
+      service_name:
+        required: true
+        type: string
+      image_file:
+        required: true
+        type: string
+      image_name:
+        required: true
+        type: string
+      source_repo:
+        required: true
+        type: string
+      target_repo:
+        required: true
+        type: string
+      workload_identity:
+        required: true
+        type: string
+      workload_identity_provider:
+        required: false
+        type: string
+        default: 'projects/166389283410/locations/global/workloadIdentityPools/github-actions-pool/providers/github-actions-prvdr'
+
+jobs:
+  deploy:
+    name: "Deploy"
+    runs-on: ubuntu-latest
+    environment:
+      name: ${{ inputs.environment }}
+    permissions:
+      contents: 'read'
+      id-token: 'write'
+    env:
+      SERVICE_NAME: ${{ inputs.service_name }}
+      IMAGE_NAME: ${{ inputs.image_name }}
+      IMAGE_FILE: ${{ inputs.image_file }}
+      SOURCE_REPO: ${{ inputs.source_repo }}
+      TARGET_REPO: ${{ inputs.target_repo }}
+    steps:
+    - uses: actions/checkout@v3
+    - name: 'Authenticate to Google Cloud'
+      uses: 'google-github-actions/auth@v0'
+      with:
+        workload_identity_provider: ${{ inputs.workload_identity_provider }}
+        service_account: ${{ inputs.workload_identity }}
+    - name: 'Authenticate to Docker Repo'
+      run: |-
+        gcloud auth configure-docker "$(sed -e 's|/.*||' <<<"$SOURCE_REPO")"
+        gcloud auth configure-docker "$(sed -e 's|/.*||' <<<"$TARGET_REPO")"
+    - uses: actions/download-artifact@master
+      with:
+        name: image_file
+    - name: 'Set Env'
+      run: |-
+        SOURCE_IMAGE256="$(jq -r '.[env.IMAGE_NAME]' "$IMAGE_FILE")"
+        echo "SOURCE_IMAGE256=${SOURCE_IMAGE256}" >> "$GITHUB_ENV"
+        echo "TARGET_IMAGE256=${TARGET_REPO}${SOURCE_IMAGE256#$SOURCE_REPO}" >> "$GITHUB_ENV"
+        echo "REVISION_TAG=sha-$(head -c 7 <<<"$GITHUB_SHA")" >> "$GITHUB_ENV"
+        echo "REVISION_SUFFIX=$GITHUB_RUN_ID" >> "$GITHUB_ENV"
+    - name: 'Copy Image'
+      run: |-
+        skopeo copy docker://"${SOURCE_IMAGE256/:*@sha256/@sha256}" docker://"${TARGET_IMAGE256%@sha256*}"
+    - name: 'Deploy CloudRun'
+      run: |-
+        printf "Service: %s-%s:%s\n" "$SERVICE_NAME" "$REVISION_SUFFIX" "$REVISION_TAG"
+        printf "Image: %s\n" "$TARGET_IMAGE256"
+        gcloud beta run deploy "$SERVICE_NAME" --image="$TARGET_IMAGE256" --revision-suffix "$REVISION_SUFFIX" --tag "$REVISION_TAG" --flags-file=config/${{ inputs.environment }}.yml
