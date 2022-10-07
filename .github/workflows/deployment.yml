@@ -63,7 +63,7 @@ jobs:
 
   deploy-development:
     name: Development
-    needs: [build, infra-development]
+    needs: [build] #, infra-development]
     uses: ./.github/workflows/cloudrun.yml
     with:
       environment: development
