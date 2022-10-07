@@ -54,7 +54,7 @@ jobs:
         name: image_file
     - name: 'Set Env'
       run: |-
-        echo "SOURCE_IMAGE256=$(jq -r '.[env.IMAGE_NAME]' "$IMAGES_FILE")" >> "$GITHUB_ENV"
+        echo "SOURCE_IMAGE256=$(jq -r '.[env.IMAGE_NAME]' "$IMAGE_FILE")" >> "$GITHUB_ENV"
         echo "TARGET_IMAGE256=${TARGET_REPO}${SOURCE_IMAGE256#$SOURCE_REPO}" >> "$GITHUB_ENV"
         echo "REVISION_TAG=sha-$(head -c 7 <<<"$GITHUB_SHA")" >> "$GITHUB_ENV"
         echo "REVISION_SUFFIX=$GITHUB_RUN_ID" >> "$GITHUB_ENV"
