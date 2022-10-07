@@ -68,7 +68,7 @@ jobs:
     with:
       environment: development
       service_name: gcp-django
-      image_name: shell
+      image_name: runtime
       image_file: images.json
       source_repo: $SOURCE_REPO
       target_repo: us-central1-docker.pkg.dev/goodlittlescript-io-dev/gcp-django
@@ -82,7 +82,7 @@ jobs:
     with:
       environment: production
       service_name: gcp-django
-      image_name: shell
+      image_name: runtime
       image_file: images.json
       source_repo: $SOURCE_REPO
       target_repo: us-central1-docker.pkg.dev/goodlittlescript-io-prd/gcp-django
