@@ -61,7 +61,7 @@ jobs:
         echo "REVISION_SUFFIX=$GITHUB_RUN_ID" >> "$GITHUB_ENV"
     - name: 'Copy Image'
       run: |-
-        skopeo copy docker://"${SOURCE_IMAGE256/:*@sha256/@sha256}" docker://"${TARGET_IMAGE256%@sha256.*}"
+        skopeo copy docker://"${SOURCE_IMAGE256/:*@sha256/@sha256}" docker://"${TARGET_IMAGE256%@sha256*}"
     - name: 'Deploy CloudRun'
       run: |-
         printf "Service: %s-%s:%s\n" "$SERVICE_NAME" "$REVISION_SUFFIX" "$REVISION_TAG"
