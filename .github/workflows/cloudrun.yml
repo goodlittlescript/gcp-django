@@ -49,6 +49,10 @@ jobs:
       with:
         workload_identity_provider: ${{ inputs.workload_identity_provider }}
         service_account: ${{ inputs.workload_identity }}
+    - name: 'Authenticate to Docker Repo'
+      run: |-
+        gcloud auth configure-docker "$(sed -e 's|/.*||' <<<"$SOURCE_REPO")"
+        gcloud auth configure-docker "$(sed -e 's|/.*||' <<<"$TARGET_REPO")"
     - uses: actions/download-artifact@master
       with:
         name: image_file
