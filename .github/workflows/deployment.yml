@@ -41,10 +41,6 @@ jobs:
       with:
         name: image_file
         path: images.json
-    - name: Set outputs
-      run: |-
-        echo "::set-output image_file=images.json"
-        echo "::set-output source_repo=$SOURCE_REPO"
 
   infra-development:
     name: Development
@@ -73,8 +69,8 @@ jobs:
       environment: development
       service_name: gcp-django
       image_name: shell
-      image_file: ${{ needs.build.outputs.image_file }}
-      source_repo: ${{ needs.build.outputs.source_repo }}
+      image_file: images.json
+      source_repo: $SOURCE_REPO
       target_repo: us-central1-docker.pkg.dev/goodlittlescript-io-dev/gcp-django
       workload_identity: dt-gcp-django@goodlittlescript-io-dev.iam.gserviceaccount.com
 
@@ -87,7 +83,7 @@ jobs:
       environment: production
       service_name: gcp-django
       image_name: shell
-      image_file: ${{ needs.build.outputs.image_file }}
-      source_repo: ${{ needs.build.outputs.source_repo }}
+      image_file: images.json
+      source_repo: $SOURCE_REPO
       target_repo: us-central1-docker.pkg.dev/goodlittlescript-io-prd/gcp-django
       workload_identity: dt-gcp-django@goodlittlescript-io-prd.iam.gserviceaccount.com
