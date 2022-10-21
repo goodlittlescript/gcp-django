@@ -1,16 +1,16 @@
 from django.http import HttpResponse
-import json
+from http import HTTPStatus
 
 import logging
 logger = logging.getLogger(__name__)
 
 def index(request):
-    return HttpResponse("GCP Django")
+    return HttpResponse("GCP Django\n")
 
-def healthcheck(request):
-    logger.info("Performing healthcheck")
-    response = {'status': 'ok'}
-    return HttpResponse(json.dumps(response))
+def return_status(request, status):
+    logger.info(f"Status: {status}")
+    response = next((s.phrase for s in HTTPStatus if s == status), status)
+    return HttpResponse(f"{response}\n", status=status)
 
-def boom(request):
-    raise Exception('Boom!')
+def raise_error(request, message='Boom!'):
+    raise Exception(message)

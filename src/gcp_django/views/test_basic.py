@@ -7,12 +7,13 @@ class GcpDjangoViewsBasicTests(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, "GCP Django")
 
-    def test_healthcheck(self):
-        response = self.client.get('/healthcheck')
-        self.assertEqual(response.status_code, 200)
-        response_obj = json.loads(response.content)
-        self.assertEqual('ok', response_obj['status'])
+    def test_return_status(self):
+        response = self.client.get('/status/200')
+        self.assertContains(response, "OK", status_code=200)
 
-    def test_boom(self):
+        response = self.client.post('/status/404')
+        self.assertContains(response, "Not Found", status_code=404)
+
+    def test_raise_error(self):
         with self.assertRaisesRegexp(Exception, 'Boom!') as err:
-            self.client.get('/boom')
+            self.client.get('/error')

@@ -21,8 +21,8 @@ from .views import storage
 urlpatterns = [
     path('', basic.index),
     path('admin/', admin.site.urls),
-    path('healthcheck', basic.healthcheck),
-    path('boom', basic.boom),
+    path('status/<int:status>', basic.return_status),
+    path('error', basic.raise_error),
     path('storage/get', storage.get_data),
     path('storage/set', storage.set_data),
 ]
