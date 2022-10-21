@@ -1,6 +1,7 @@
 from django.test import TestCase
 import json
 
+
 class GcpDjangoViewsStorageTests(TestCase):
     def test_get_set(self):
         get_response = self.client.get('/storage/get')

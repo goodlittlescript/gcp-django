@@ -17,6 +17,7 @@ RUN apt-get update && \
     mv berglas /bin/berglas && \
     rm /app/* && \
     rm -rf /var/lib/apt/lists/*
+ENV PATH=/home/appuser/.local/bin:$PATH
 
 # Install project dependencies
 COPY ./requirements.txt /app

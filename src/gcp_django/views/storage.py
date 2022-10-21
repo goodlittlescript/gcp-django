@@ -10,6 +10,7 @@ logger = logging.getLogger(__name__)
 object_name = 'last-data'
 bucket_name = os.environ['DATA_BUCKET']
 
+
 def get_data(request):
     logger.info(f"Get data: {object_name}")
     bucket = storage.Client("").get_bucket(bucket_name)
@@ -17,14 +18,14 @@ def get_data(request):
     response = blob.download_as_string()
     return HttpResponse(response)
 
+
 def set_data(request):
     logger.info(f"Set data: {object_name}")
     bucket = storage.Client("").get_bucket(bucket_name)
     blob = bucket.blob(object_name)
-    now = datetime.datetime.utcnow().replace(tzinfo=datetime.timezone.utc, microsecond=0)
-    data = {
-        "lastUpdate": now.isoformat().replace('+00:00', 'Z')
-    }
+    now = datetime.datetime.utcnow().replace(
+        tzinfo=datetime.timezone.utc, microsecond=0)
+    data = {"lastUpdate": now.isoformat().replace('+00:00', 'Z')}
     data_str = json.dumps(data)
     blob.upload_from_string(data_str)
     return HttpResponse(data_str)

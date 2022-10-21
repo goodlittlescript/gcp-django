@@ -32,6 +32,14 @@ clean () {
 # workflow
 #
 
+lint () {
+  up && docker compose exec shell yapf -r -d .
+}
+
+fix () {
+  up && docker compose exec shell yapf -r -vv -i .
+}
+
 test () {
   up && docker compose exec shell /app/bin/test
 }
