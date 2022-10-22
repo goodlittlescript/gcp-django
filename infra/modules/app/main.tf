@@ -51,16 +51,14 @@ resource "google_cloud_scheduler_job" "service" {
   }
 
   http_target {
-    http_method = "POST"
-    uri         = "${data.google_cloud_run_service.service.status[0].url}/schedule/run"
+    http_method = "GET"
+    uri         = "${data.google_cloud_run_service.service.status[0].url}/task/run"
     headers = {
       "Content-Type" = "application/json"
     }
     oidc_token {
       service_account_email = local.runtime_service_account
+      audience = data.google_cloud_run_service.service.status[0].url
     }
-    body = base64encode(jsonencode({
-      "key" = "value"
-    }))
   }
 }
