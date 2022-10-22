@@ -5,6 +5,6 @@
 - --set-env-vars: DATA_BUCKET=goodlittlescript-io-dev-us-central1-gcp-django-data
 - --set-env-vars: CLOUDTASKS_SERVICE_ACCOUNT_EMAIL=rt-gcp-django@goodlittlescript-io-dev.iam.gserviceaccount.com
 - --set-env-vars: CLOUDRUN_AUDIENCE=gcp-django-onmhavhggq-uc.a.run.app
-- --set-env-vars: CLOUDTASKS_QUEUE=gcp-django
+- --set-env-vars: CLOUDTASKS_QUEUE=projects/goodlittlescript-io-dev/locations/us-central1/queues/gcp-django
 - --project: goodlittlescript-io-dev
 - --region: us-central1
