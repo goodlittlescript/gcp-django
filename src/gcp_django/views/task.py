@@ -6,9 +6,9 @@ import json
 import logging
 logger = logging.getLogger(__name__)
 
+service_url = os.environ['CLOUDRUN_SERVICE_URL']
 service_account_email = os.environ['CLOUDTASKS_SERVICE_ACCOUNT_EMAIL']
 queue = os.environ['CLOUDTASKS_QUEUE']
-audience = os.environ['CLOUDRUN_AUDIENCE']
 
 
 def run(request):
@@ -25,13 +25,13 @@ def enqueue(request):
     task = {
         'http_request': {
             'http_method': tasks_v2.HttpMethod.GET,
-            'url': f'https://{audience}/schedule/run',
+            'url': f'{service_url}/task/run',
             'headers': {
                 'traceparent': request.headers.get('traceparent', ''),
             },
             'oidc_token': {
                 'service_account_email': service_account_email,
-                'audience': audience,
+                'audience': service_url,
             },
         },
     }
