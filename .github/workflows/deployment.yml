@@ -28,10 +28,11 @@ jobs:
     - name: 'Authenticate to Docker Repo'
       run: gcloud auth configure-docker "$(sed -e 's|/.*||' <<<"$SOURCE_REPO")"
     - name: 'Authenticate in Docker Compose'
-      run: echo "GOOGLE_APPLICATION_CREDENTIALS=/app/$(basename "$GOOGLE_APPLICATION_CREDENTIALS")" >> docker-compose.env
+      run: |-
+        printf "\n%s\n" "GOOGLE_APPLICATION_CREDENTIALS=/app/$(basename "$GOOGLE_APPLICATION_CREDENTIALS")" >> docker-compose.env
     - name: 'Set Env'
       run: |-
-        echo "RUNTIME_IMAGE=${SOURCE_REPO}/runtime:${GITHUB_SHA}" >> "$GITHUB_ENV"
+        printf "%s\n" "RUNTIME_IMAGE=${SOURCE_REPO}/runtime:${GITHUB_SHA}" >> "$GITHUB_ENV"
     - name: Build images
       run: ./Projectfile images
     - name: Test images
@@ -71,10 +72,10 @@ jobs:
     - name: 'Set Env'
       run: |-
         SOURCE_IMAGE256="$(jq -r '.[env.IMAGE_NAME]' "$IMAGES_FILE")"
-        echo "SOURCE_IMAGE256=${SOURCE_IMAGE256}" >> "$GITHUB_ENV"
-        echo "TARGET_IMAGE256=${TARGET_REPO}${SOURCE_IMAGE256#$SOURCE_REPO}" >> "$GITHUB_ENV"
-        echo "REVISION_TAG=sha-$(head -c 7 <<<"$GITHUB_SHA")" >> "$GITHUB_ENV"
-        echo "REVISION_SUFFIX=$GITHUB_RUN_ID" >> "$GITHUB_ENV"
+        printf "%s\n" "SOURCE_IMAGE256=${SOURCE_IMAGE256}" >> "$GITHUB_ENV"
+        printf "%s\n" "TARGET_IMAGE256=${TARGET_REPO}${SOURCE_IMAGE256#$SOURCE_REPO}" >> "$GITHUB_ENV"
+        printf "%s\n" "REVISION_TAG=sha-$(head -c 7 <<<"$GITHUB_SHA")" >> "$GITHUB_ENV"
+        printf "%s\n" "REVISION_SUFFIX=$GITHUB_RUN_ID" >> "$GITHUB_ENV"
     - name: 'Copy Image'
       run: |-
         skopeo copy docker://"${SOURCE_IMAGE256/:*@sha256/@sha256}" docker://"${TARGET_IMAGE256%@sha256*}"
@@ -113,10 +114,10 @@ jobs:
     - name: 'Set Env'
       run: |-
         SOURCE_IMAGE256="$(jq -r '.[env.IMAGE_NAME]' "$IMAGES_FILE")"
-        echo "SOURCE_IMAGE256=${SOURCE_IMAGE256}" >> "$GITHUB_ENV"
-        echo "TARGET_IMAGE256=${TARGET_REPO}${SOURCE_IMAGE256#$SOURCE_REPO}" >> "$GITHUB_ENV"
-        echo "REVISION_TAG=sha-$(head -c 7 <<<"$GITHUB_SHA")" >> "$GITHUB_ENV"
-        echo "REVISION_SUFFIX=$GITHUB_RUN_ID" >> "$GITHUB_ENV"
+        printf "%s\n" "SOURCE_IMAGE256=${SOURCE_IMAGE256}" >> "$GITHUB_ENV"
+        printf "%s\n" "TARGET_IMAGE256=${TARGET_REPO}${SOURCE_IMAGE256#$SOURCE_REPO}" >> "$GITHUB_ENV"
+        printf "%s\n" "REVISION_TAG=sha-$(head -c 7 <<<"$GITHUB_SHA")" >> "$GITHUB_ENV"
+        printf "%s\n" "REVISION_SUFFIX=$GITHUB_RUN_ID" >> "$GITHUB_ENV"
     - name: 'Copy Image'
       run: |-
         skopeo copy docker://"${SOURCE_IMAGE256/:*@sha256/@sha256}" docker://"${TARGET_IMAGE256%@sha256*}"

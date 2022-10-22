@@ -17,6 +17,7 @@ from django.contrib import admin
 from django.urls import path
 from .views import basic
 from .views import storage
+from .views import task
 
 urlpatterns = [
     path('', basic.index),
@@ -26,4 +27,6 @@ urlpatterns = [
     path('status/<int:status>', basic.return_status),
     path('storage/get', storage.get_data),
     path('storage/set', storage.set_data),
+    path('task/run', task.run),
+    path('task/enqueue', task.enqueue),
 ]

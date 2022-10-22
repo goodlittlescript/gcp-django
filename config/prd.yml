@@ -1,7 +1,10 @@
 # Production flags file
 - --service-account: rt-gcp-django@goodlittlescript-io-prd.iam.gserviceaccount.com
 - --set-env-vars: DJANGO_SECRET_KEY=sm://goodlittlescript-io-prd/gcp-django--secret-key
-- --set-env-vars: "DJANGO_ALLOWED_HOSTS=gcp-django.goodlittlescript.io:gcp-django-fkakrnzzpq-uc.a.run.app"
+- --set-env-vars: DJANGO_ALLOWED_HOSTS=gcp-django.goodlittlescript.io:gcp-django-fkakrnzzpq-uc.a.run.app
 - --set-env-vars: DATA_BUCKET=goodlittlescript-io-prd-us-central1-gcp-django-data
+- --set-env-vars: CLOUDRUN_SERVICE_URL=https://gcp-django-fkakrnzzpq-uc.a.run.app
+- --set-env-vars: CLOUDTASKS_SERVICE_ACCOUNT_EMAIL=rt-gcp-django@goodlittlescript-io-prd.iam.gserviceaccount.com
+- --set-env-vars: CLOUDTASKS_QUEUE=projects/goodlittlescript-io-prd/locations/us-central1/queues/gcp-django
 - --project: goodlittlescript-io-prd
 - --region: us-central1

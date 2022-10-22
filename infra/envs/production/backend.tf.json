@@ -1,0 +1,10 @@
+{
+  "terraform": {
+    "backend": {
+      "gcs": {
+        "bucket": "goodlittlescript-io-prd-tfstate",
+        "prefix": "gcp-django"
+      }
+    }
+  }
+}
