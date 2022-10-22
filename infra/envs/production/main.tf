@@ -1,9 +1,3 @@
-terraform {
-  backend "gcs" {
-    bucket = ""
-  }
-}
-
 locals {
   project = "goodlittlescript-io-prd"
   appname = "gcp-django"
