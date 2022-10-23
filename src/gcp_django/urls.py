@@ -27,6 +27,7 @@ urlpatterns = [
     path('status/<int:status>', basic.return_status),
     path('storage/get', storage.get_data),
     path('storage/set', storage.set_data),
+    path('storage/url', storage.get_data_url),
     path('task/run', task.run),
     path('task/enqueue', task.enqueue),
 ]
