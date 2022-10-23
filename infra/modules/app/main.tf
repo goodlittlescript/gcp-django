@@ -42,7 +42,7 @@ resource "google_cloud_scheduler_job" "service" {
   project          = data.google_cloud_run_service.service.project
   region           = data.google_cloud_run_service.service.location
   description      = "${local.service} scheduler"
-  schedule         = "*/8 * * * *"
+  schedule         = "0 */8 * * *"
   time_zone        = local.timezone
   attempt_deadline = "60s"
 
