@@ -97,7 +97,7 @@ resource "google_bigquery_table" "service" {
   {
     "name": "metadata",
     "type": "JSON",
-    "mode": "REQUIRED",
+    "mode": "NULLABLE",
     "description": "Metadata blob"
   },
   {
