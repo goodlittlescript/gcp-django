@@ -1,0 +1,126 @@
+#!/bin/bash
+export base_url="http://localhost:8080"
+
+log () {
+  printf "[%s] %s %s - %s\n" "$(date -u +"%Y-%m-%dT%H:%M:%SZ")" "$1" "$(basename -- "$0")" "$2" >&2
+}
+
+background () {
+  log_file="${TS_TMP_DIR:-tmp}/background.log"
+  log INFO "background: $* ($log_file)"
+  mkdir -p "$(dirname "$log_file")"
+  "$@" >"$log_file" 2>&1 &
+  background_pids="$background_pids $!"
+  trap cleanup INT TERM EXIT
+}
+
+cleanup () {
+  set +e
+  exit_status="$?"
+  if [ -n "$background_pids" ]
+  then
+    kill $background_pids
+    wait $background_pids
+  fi
+  exit "$exit_status"
+}
+
+wait_until () {
+  try=1
+  max_tries="${wait_until_max_tries:-10}"
+  while [ "$try" -le "$max_tries" ]
+  do
+    if "$@"
+    then
+      return 0
+    else
+      log INFO "wait_until: $* (try $try/$max_tries)"
+      sleep "${wait_until_sleep_in_s:-1}"
+      try="$((try + 1))"
+    fi
+  done
+
+  log ERROR "wait_until failed after $max_tries tries"
+  exit 1
+}
+
+set_last_response_file () {
+  last_response_file="${ts_test_dir:-$PWD}/last_response"
+  last_header_file="${last_response_file}.header"
+  mkdir -p "${last_response_file%/last_response}"
+}
+
+unset_last_response_file () {
+  unset last_response_file
+  unset last_header_file
+}
+
+healthcheck () {
+  path="${1:-/healthcheck}"
+  [ "$(curl -s -g --max-time 1 -o /dev/null -w "%{http_code}" "${base_url:?no base_url set}/${path#/}")" = "200" ]
+}
+
+get () {
+  log INFO "get $1"
+  curl -s -g -D "${last_header_file:-/dev/null}" -o "${last_response_file:-/dev/stdout}" "${base_url}/${1#/}" "$@"
+}
+
+put () {
+  log INFO "put $1"
+  curl -s -g -D "${last_header_file:-/dev/null}" -o "${last_response_file:-/dev/stdout}" -X PUT -d@- "${base_url}/${1#/}" "$@"
+}
+
+post () {
+  log INFO "post $1"
+  curl -s -g -D "${last_header_file:-/dev/null}" -o "${last_response_file:-/dev/stdout}" -X POST -d@- "${base_url}/${1#/}" "$@"
+}
+
+delete () {
+  log INFO "delete $1"
+  curl -s -g -D "${last_header_file:-/dev/null}" -o "${last_response_file:-/dev/stdout}" -X DELETE "${base_url}/${1#/}" "$@"
+}
+
+last_header () {
+  cat "${last_header_file:?no last_header_file specified}"
+}
+
+last_response () {
+  cat "${last_response_file:?no last_response_file specified}"
+}
+
+last_response_code () {
+  last_header | awk 'NR==1 {print $2}'
+}
+
+assert_json () {
+  jq -S . | assert_output "\
+$(jq -n -S "$@")
+"
+}
+
+assert_response_json () {
+  last_response | assert_json "$@"
+  if [ "$?" -ne 0 ]
+  then exit 1
+  fi
+}
+
+assert_response_code () {
+  expected="$1"
+  actual="$(last_response_code)"
+  if ! [ "$actual" -eq "$expected" ]
+  then
+    printf "expected response code %s but was %s\n" "$expected" "$actual" >&2
+    exit 1
+  fi
+}
+
+assert_response () {
+  assert_response_code "${1:?no response code specified}"
+  shift 1
+  assert_response_json "$@"
+}
+
+setup () {
+  set_last_response_file
+}

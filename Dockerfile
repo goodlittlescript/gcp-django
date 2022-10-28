@@ -7,21 +7,28 @@ RUN groupadd -g 1001 appuser && \
     chown appuser:appuser /app
 WORKDIR /app
 
-# Install development dependencies
+# Install platform dependencies
 ARG BERGLAS_VERSION=1.0.1
 RUN apt-get update && \
     apt-get dist-upgrade -y && \
-    apt-get install -y curl jq && \
+    apt-get install -y curl && \
     curl -OL "https://github.com/GoogleCloudPlatform/berglas/releases/download/v${BERGLAS_VERSION}/berglas_${BERGLAS_VERSION}_linux_amd64.tar.gz" && \
     tar xvzf "berglas_${BERGLAS_VERSION}_linux_amd64.tar.gz" && \
     mv berglas /bin/berglas && \
     rm /app/* && \
+    apt-get remove -y curl && \
     rm -rf /var/lib/apt/lists/*
-ENV PATH=/home/appuser/.local/bin:$PATH
 
 # Install project dependencies
+ENV PATH=/home/appuser/.local/bin:$PATH
 COPY ./requirements.txt /app
 RUN pip install -r requirements.txt
+
+# Install development dependencies
+RUN apt-get update && \
+    apt-get install -y procps curl jq && \
+    curl -o /usr/local/bin/ts -L https://raw.githubusercontent.com/thinkerbot/ts/master/bin/ts && \
+    chmod +x /usr/local/bin/ts
 
 USER appuser
 

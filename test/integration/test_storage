@@ -1,0 +1,8 @@
+#!/bin/bash
+. test/integration/helpers
+
+export base_url="http://localhost:8081"
+background ./bin/run -b "${base_url#http://}"
+wait_until get 
+
+. ts
