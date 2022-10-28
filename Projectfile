@@ -33,25 +33,29 @@ clean () {
 #
 
 lint () {
-  up && docker compose exec shell yapf -r -d .
+  up && docker compose exec shell /app/bin/lint
 }
 
 fix () {
-  up && docker compose exec shell yapf -r -vv -i .
+  up && docker compose exec shell /app/bin/fix
+}
+
+run () {
+  up && docker compose exec shell /app/bin/run
 }
 
 test () {
   up && docker compose exec shell /app/bin/test
 }
 
+docs () {
+  docker compose run --rm --service-ports docs "$@"
+}
+
 push () {
   docker compose push
   docker compose convert --resolve-image-digests --format json |
   jq '.services | map_values(.image)'
-}
-
-docs () {
-  docker compose run --rm --service-ports docs "$@"
 }
 
 #
