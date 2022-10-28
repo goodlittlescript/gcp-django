@@ -1,5 +1,4 @@
 #!/bin/bash
-export base_url="http://localhost:8080"
 
 log () {
   printf "[%s] %s %s - %s\n" "$(date -u +"%Y-%m-%dT%H:%M:%SZ")" "$1" "$(basename -- "$0")" "$2" >&2
@@ -45,40 +44,26 @@ wait_until () {
   exit 1
 }
 
-set_last_response_file () {
-  last_response_file="${ts_test_dir:-$PWD}/last_response"
+set_curl_capture () {
+  export CURL_HOME="${ts_test_dir:-$PWD}"
+  last_response_file="$CURL_HOME/last_response"
   last_header_file="${last_response_file}.header"
-  mkdir -p "${last_response_file%/last_response}"
+
+  mkdir -p "$CURL_HOME"
+  cat > "$CURL_HOME/.curlrc" <<DOC
+output = $last_response_file
+dump-header = $last_header_file
+DOC
 }
 
-unset_last_response_file () {
+unset_curl_capture () {
+  unset CURL_HOME
   unset last_response_file
   unset last_header_file
 }
 
 healthcheck () {
-  path="${1:-/}"
-  [ "$(curl -s -g --max-time 1 -o /dev/null -w "%{http_code}" "${base_url:?no base_url set}/${path#/}")" = "200" ]
-}
-
-get () {
-  log INFO "get $1"
-  curl -s -g -D "${last_header_file:-/dev/null}" -o "${last_response_file:-/dev/stdout}" "${base_url}/${1#/}" "$@"
-}
-
-put () {
-  log INFO "put $1"
-  curl -s -g -D "${last_header_file:-/dev/null}" -o "${last_response_file:-/dev/stdout}" -X PUT -d@- "${base_url}/${1#/}" "$@"
-}
-
-post () {
-  log INFO "post $1"
-  curl -s -g -D "${last_header_file:-/dev/null}" -o "${last_response_file:-/dev/stdout}" -X POST -d@- "${base_url}/${1#/}" "$@"
-}
-
-delete () {
-  log INFO "delete $1"
-  curl -s -g -D "${last_header_file:-/dev/null}" -o "${last_response_file:-/dev/stdout}" -X DELETE "${base_url}/${1#/}" "$@"
+  [ "$(curl -s -g --max-time 1 -o /dev/null -w "%{http_code}" "$@")" = "200" ]
 }
 
 last_header () {
@@ -99,13 +84,6 @@ $(jq -n -S "$@")
 "
 }
 
-assert_response_json () {
-  last_response | assert_json "$@"
-  if [ "$?" -ne 0 ]
-  then exit 1
-  fi
-}
-
 assert_response_code () {
   expected="$1"
   actual="$(last_response_code)"
@@ -116,12 +94,21 @@ assert_response_code () {
   fi
 }
 
-assert_response () {
+assert_response_json () {
   assert_response_code "${1:?no response code specified}"
   shift 1
-  assert_response_json "$@"
+
+  last_response | assert_json "$@"
+  if [ "$?" -ne 0 ]
+  then exit 1
+  fi
+}
+
+assert_response () {
+  assert_response_code "${1:?no response code specified}"
+  last_response | assert_output "$2"
 }
 
 setup () {
-  set_last_response_file
+  set_curl_capture
 }
