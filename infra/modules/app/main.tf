@@ -58,7 +58,54 @@ resource "google_cloud_scheduler_job" "service" {
     }
     oidc_token {
       service_account_email = local.runtime_service_account
-      audience = data.google_cloud_run_service.service.status[0].url
+      audience              = data.google_cloud_run_service.service.status[0].url
     }
   }
+}
+
+//
+// Dataset
+//
+
+resource "google_bigquery_table" "service" {
+  for_each = toset([
+    "checks"
+  ])
+  project    = local.project
+  dataset_id = replace(local.service, "/\\W/", "_")
+  table_id   = each.value
+
+  time_partitioning {
+    type  = "DAY"
+    field = "extracted_at"
+  }
+
+  schema = <<EOF
+[
+   {
+    "name": "uuid",
+    "type": "STRING",
+    "mode": "REQUIRED",
+    "description": "A uuid assigned to each record"
+  },
+  {
+    "name": "extracted_at",
+    "type": "TIMESTAMP",
+    "mode": "REQUIRED",
+    "description": "The extraction time (partitioning field)"
+  },
+  {
+    "name": "metadata",
+    "type": "JSON",
+    "mode": "REQUIRED",
+    "description": "Metadata blob"
+  },
+  {
+    "name": "data",
+    "type": "JSON",
+    "mode": "REQUIRED",
+    "description": "Data blob"
+  }
+]
+EOF
 }
