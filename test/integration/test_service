@@ -1,0 +1,67 @@
+#!/bin/bash
+. test/integration/helpers
+
+if [ -z "$TEST_URL" ]
+then 
+  export TEST_URL="http://localhost:8081"
+  unset DJANGO_DEBUG
+  unset GUNICORN_OPTS
+
+  background ./bin/run -b "${TEST_URL#http://}"
+  wait_until healthcheck "$TEST_URL"
+fi
+
+#
+# Basic
+#
+
+test_index () {
+  curl "$TEST_URL"
+  assert_response 200 "\
+GCP Django
+"
+}
+
+test_echo () {
+  curl "$TEST_URL/echo"
+  assert_response_code 200
+  last_response | jq -r '[.method, .url] | join(" ")' | assert_output "\
+GET $TEST_URL/echo
+"
+}
+
+test_error () {
+  curl "$TEST_URL/error"
+  assert_response_code 500
+  last_response | grep -q 'Server Error'
+}
+
+test_status () {
+  curl "$TEST_URL/status/404"
+  assert_response 404 "\
+Not Found
+"
+}
+
+#
+# Storage
+#
+
+test_storage () {
+  curl "$TEST_URL/storage/get"
+  before_time_s="$(last_response | jq  -r '.lastUpdate | fromdate')"
+
+  curl "$TEST_URL/storage/set"
+  after_time_s="$(last_response | jq  -r '.lastUpdate | fromdate')"
+
+  [ "$before_time_s" -lt "$after_time_s" ]
+  assert_status "$?" 0 "lastUpdate was not updated"
+
+  curl "$TEST_URL/storage/get"
+  confirm_time_s="$(last_response | jq  -r '.lastUpdate | fromdate')"
+
+  [ "$after_time_s" = "$confirm_time_s" ]
+  assert_status "$?" 0 "lastUpdate was not confirmed"
+}
+
+. ts
