@@ -28,6 +28,12 @@ resource "google_cloud_tasks_queue" "service" {
   name     = data.google_cloud_run_service.service.name
   project  = data.google_cloud_run_service.service.project
   location = data.google_cloud_run_service.service.location
+
+  rate_limits {
+    max_concurrent_dispatches = 3
+    max_dispatches_per_second = 2
+  }
+
   retry_config {
     min_backoff = "600s"
   }
@@ -51,8 +57,8 @@ resource "google_cloud_scheduler_job" "service" {
   }
 
   http_target {
-    http_method = "GET"
-    uri         = "${data.google_cloud_run_service.service.status[0].url}/task/run"
+    http_method = "POST"
+    uri         = "${data.google_cloud_run_service.service.status[0].url}/task"
     headers = {
       "Content-Type" = "application/json"
     }
