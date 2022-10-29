@@ -1,3 +1,3 @@
 #!/bin/bash
-(cd /app/src; python manage.py test) && \
+./src/manage.py test /app/test/unit && \
 ./test/integration/suite
