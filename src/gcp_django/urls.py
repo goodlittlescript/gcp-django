@@ -26,6 +26,5 @@ urlpatterns = [
     path('error', basic.raise_error),
     path('status/<int:status>', basic.return_status),
     path('storage', storage.StorageApi.as_view()),
-    path('task/run', task.run),
-    path('task/enqueue', task.enqueue),
+    path('task', task.TaskApi.as_view()),
 ]

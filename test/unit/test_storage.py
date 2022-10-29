@@ -3,7 +3,7 @@ import json
 
 
 class StorageApiTests(TestCase):
-    def test_get_set(self):
+    def test_storage(self):
         get_response = self.client.get('/storage')
         self.assertEqual(get_response.status_code, 200)
 

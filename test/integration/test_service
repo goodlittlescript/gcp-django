@@ -64,4 +64,18 @@ test_storage () {
   assert_status "$?" 0 "lastUpdate was not confirmed"
 }
 
+#
+# Task
+#
+
+test_task () {
+curl "$TEST_URL/task"
+assert_response_json 200 '
+{
+  "status": "complete"
+}
+'
+# haven't figured out how to mock enqueue to test locallly...
+}
+
 . ts
