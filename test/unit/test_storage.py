@@ -2,12 +2,12 @@ from django.test import TestCase
 import json
 
 
-class GcpDjangoViewsStorageTests(TestCase):
+class StorageApiTests(TestCase):
     def test_get_set(self):
-        get_response = self.client.get('/storage/get')
+        get_response = self.client.get('/storage')
         self.assertEqual(get_response.status_code, 200)
 
-        set_response = self.client.get('/storage/set')
+        set_response = self.client.post('/storage')
         self.assertEqual(set_response.status_code, 200)
 
         # demonstrate the data has been updated by confirming the previous
@@ -16,7 +16,7 @@ class GcpDjangoViewsStorageTests(TestCase):
         set_data = json.loads(set_response.content)
         self.assertTrue(set_data['lastUpdate'] > get_data['lastUpdate'])
 
-        get_response = self.client.get('/storage/get')
+        get_response = self.client.get('/storage')
         self.assertEqual(get_response.status_code, 200)
 
         # demonstrate that after update the lastUpdate timestamp matches

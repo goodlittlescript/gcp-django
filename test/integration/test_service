@@ -48,16 +48,16 @@ Not Found
 #
 
 test_storage () {
-  curl "$TEST_URL/storage/get"
+  curl "$TEST_URL/storage"
   before_time_s="$(last_response | jq  -r '.lastUpdate | fromdate')"
 
-  curl "$TEST_URL/storage/set"
+  curl -X POST -d@/dev/null "$TEST_URL/storage"
   after_time_s="$(last_response | jq  -r '.lastUpdate | fromdate')"
 
   [ "$before_time_s" -lt "$after_time_s" ]
   assert_status "$?" 0 "lastUpdate was not updated"
 
-  curl "$TEST_URL/storage/get"
+  curl "$TEST_URL/storage"
   confirm_time_s="$(last_response | jq  -r '.lastUpdate | fromdate')"
 
   [ "$after_time_s" = "$confirm_time_s" ]

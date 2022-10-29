@@ -25,8 +25,7 @@ urlpatterns = [
     path('echo', basic.echo),
     path('error', basic.raise_error),
     path('status/<int:status>', basic.return_status),
-    path('storage/get', storage.get_data),
-    path('storage/set', storage.set_data),
+    path('storage', storage.StorageApi.as_view()),
     path('task/run', task.run),
     path('task/enqueue', task.enqueue),
 ]
