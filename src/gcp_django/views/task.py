@@ -29,7 +29,7 @@ class TaskApi(View):
         client = tasks_v2.CloudTasksClient()
         task = {
             'http_request': {
-                'http_method': tasks_v2.HttpMethod.POST,
+                'http_method': tasks_v2.HttpMethod.GET,
                 'url': f'{service_url}/task',
                 'headers': {
                     'traceparent': request.headers.get('traceparent', ''),
