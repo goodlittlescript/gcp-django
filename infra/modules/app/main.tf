@@ -51,8 +51,8 @@ resource "google_cloud_scheduler_job" "service" {
   }
 
   http_target {
-    http_method = "GET"
-    uri         = "${data.google_cloud_run_service.service.status[0].url}/task/run"
+    http_method = "POST"
+    uri         = "${data.google_cloud_run_service.service.status[0].url}/task"
     headers = {
       "Content-Type" = "application/json"
     }
