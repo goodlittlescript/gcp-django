@@ -28,6 +28,12 @@ resource "google_cloud_tasks_queue" "service" {
   name     = data.google_cloud_run_service.service.name
   project  = data.google_cloud_run_service.service.project
   location = data.google_cloud_run_service.service.location
+
+  rate_limits {
+    max_concurrent_dispatches = 3
+    max_dispatches_per_second = 2
+  }
+
   retry_config {
     min_backoff = "600s"
   }
