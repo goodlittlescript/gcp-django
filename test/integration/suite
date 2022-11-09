@@ -1,2 +1,0 @@
-#!/bin/bash
-ts test/integration/test_* "$@"

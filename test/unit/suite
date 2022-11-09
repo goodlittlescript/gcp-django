@@ -1,2 +1,0 @@
-#!/bin/bash
-./src/manage.py test ./test/unit

@@ -1,2 +1,0 @@
-#!/bin/bash
-yapf -r -d bin src test
