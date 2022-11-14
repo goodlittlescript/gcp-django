@@ -75,7 +75,7 @@ resource "google_cloud_scheduler_job" "service" {
 
 resource "google_bigquery_table" "service" {
   for_each = toset([
-    "checks"
+    "requests"
   ])
   project    = local.project
   dataset_id = replace(local.service, "/\\W/", "_")

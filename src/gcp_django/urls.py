@@ -16,6 +16,7 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 from .views import basic
+from .views import bigquery
 from .views import storage
 from .views import task
 
@@ -25,6 +26,7 @@ urlpatterns = [
     path('echo', basic.echo),
     path('error', basic.raise_error),
     path('status/<int:status>', basic.return_status),
+    path('bigquery', bigquery.BigqueryApi.as_view()),
     path('storage', storage.StorageApi.as_view()),
     path('task', task.TaskApi.as_view()),
 ]
