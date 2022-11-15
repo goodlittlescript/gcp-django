@@ -40,14 +40,14 @@ resource "google_cloud_tasks_queue" "service" {
 }
 
 //
-// Schedule
+// Schedules
 //
 
-resource "google_cloud_scheduler_job" "service" {
-  name             = data.google_cloud_run_service.service.name
+resource "google_cloud_scheduler_job" "task" {
+  name             = "${data.google_cloud_run_service.service.name}-task"
   project          = data.google_cloud_run_service.service.project
   region           = data.google_cloud_run_service.service.location
-  description      = "${local.service} scheduler"
+  description      = "${local.service} task scheduler"
   schedule         = "0 */8 * * *"
   time_zone        = local.timezone
   attempt_deadline = "60s"
@@ -59,6 +59,32 @@ resource "google_cloud_scheduler_job" "service" {
   http_target {
     http_method = "POST"
     uri         = "${data.google_cloud_run_service.service.status[0].url}/task"
+    headers = {
+      "Content-Type" = "application/json"
+    }
+    oidc_token {
+      service_account_email = local.runtime_service_account
+      audience              = data.google_cloud_run_service.service.status[0].url
+    }
+  }
+}
+
+resource "google_cloud_scheduler_job" "bigquery" {
+  name             = "${data.google_cloud_run_service.service.name}-bigquery"
+  project          = data.google_cloud_run_service.service.project
+  region           = data.google_cloud_run_service.service.location
+  description      = "${local.service} bigquery scheduler"
+  schedule         = "0 */8 * * *"
+  time_zone        = local.timezone
+  attempt_deadline = "60s"
+
+  retry_config {
+    retry_count = 1
+  }
+
+  http_target {
+    http_method = "POST"
+    uri         = "${data.google_cloud_run_service.service.status[0].url}/bigquery"
     headers = {
       "Content-Type" = "application/json"
     }
