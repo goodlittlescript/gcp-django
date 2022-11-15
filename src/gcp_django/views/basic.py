@@ -21,11 +21,13 @@ def echo(request):
 
 
 def return_status(request, status):
-    logger.info(f"Status: {status}")
     response = next((s.phrase for s in HTTPStatus if s == status), status)
     return HttpResponse(f"{response}\n", status=status)
 
 
 def raise_error(request, message='Boom!'):
-    logger.warning(f"Error Requested: {message}")
+    logger.debug(f"raise_error: {request.META['REQUEST_METHOD']} {request.build_absolute_uri()}")
+    logger.info(f"Error Requested: {message}")
+    logger.warning(f"Error Pending: {message}")
+    logger.error(f"Error Happening: {message}")
     raise Exception(message)
