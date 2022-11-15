@@ -25,10 +25,6 @@ logconfig_dict = {
         }
     },
     'loggers': {
-        '': {
-            'handlers': ['console'],
-            'level': os.environ.get('DJANGO_LOG_LEVEL', 'INFO'),
-        },
         'gunicorn.access': {
             'handlers': ['console'],
             'level': os.environ.get('GUNICORN_ACCESS_LOG_LEVEL', 'WARN'),
@@ -37,5 +33,9 @@ logconfig_dict = {
             'handlers': ['console'],
             'level': os.environ.get('GUNICORN_ERROR_LOG_LEVEL', 'INFO'),
         },
+    },
+    'root': {
+        'handlers': ['console'],
+        'level': os.environ.get('DJANGO_LOG_LEVEL', 'WARN'),
     },
 }
