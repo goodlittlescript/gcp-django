@@ -6,5 +6,6 @@
 - --set-env-vars: CLOUDRUN_SERVICE_URL=https://gcp-django-fkakrnzzpq-uc.a.run.app
 - --set-env-vars: CLOUDTASKS_SERVICE_ACCOUNT_EMAIL=rt-gcp-django@goodlittlescript-io-prd.iam.gserviceaccount.com
 - --set-env-vars: CLOUDTASKS_QUEUE=projects/goodlittlescript-io-prd/locations/us-central1/queues/gcp-django
+- --set-env-vars: BIGQUERY_PROJECT=goodlittlescript-io-prd
 - --project: goodlittlescript-io-prd
 - --region: us-central1
