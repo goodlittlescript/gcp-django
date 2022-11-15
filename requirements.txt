@@ -32,7 +32,6 @@ rsa==4.9
 six==1.16.0
 sqlparse==0.4.3
 urllib3==1.26.12
-WARNING: Requirement protobuf included multiple times [requirements.txt]
 ## The following requirements were added by pip freeze:
 google-cloud-bigquery-storage==2.16.2
 numpy==1.23.4
