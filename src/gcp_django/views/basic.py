@@ -27,4 +27,5 @@ def return_status(request, status):
 
 
 def raise_error(request, message='Boom!'):
+    logger.warning(f"Error Requested: {message}")
     raise Exception(message)
